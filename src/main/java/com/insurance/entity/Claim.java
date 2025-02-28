@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="Claims")
@@ -18,8 +19,9 @@ public class Claim {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int claimId;
-	
+	@NotNull
 	private double claimAmount;
+	@NotNull
 	private String claimStatus;
 	
     @CreationTimestamp

@@ -1,10 +1,9 @@
 package com.insurance.restcontroller;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,26 +19,44 @@ import com.insurance.service.UserService;
 @RestController
 public class UserRestController {
 	
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
+	private final ClaimService claimService;
+	private final NomineeService nomineeService;
 	
-	@Autowired
-	private ClaimService claimService;
-	
-	@Autowired
-	private NomineeService nomineeService;
+	public UserRestController(UserService userService,ClaimService claimService,NomineeService nomineeService) {
+		this.userService = userService;
+		this.claimService = claimService;
+		this.nomineeService = nomineeService;
+		
+	}
+//	@Autowired
+//	private UserService userService;
+//	
+//	@Autowired
+//	private ClaimService claimService;
+//	
+//	@Autowired
+//	private NomineeService nomineeService;
 	
 	@GetMapping("/users/{id}")
-	public User getUser(@PathVariable ("id") Integer id, @RequestParam("status") String status) {
+	public ResponseEntity<User> getUser(@PathVariable ("id") Integer id, @RequestParam(value="status", required = false, defaultValue = "") String status) {
 		List<Claim> claims=claimService.findByClaimsId(id);
-		List<Claim> userClaims=claims.stream().filter(p-> p.getClaimStatus().equals(status.toUpperCase())).collect(Collectors.toList());
-
+		List<Claim> userClaims=null;
+		
+		
+		if(status.length()>0) {
+			userClaims=claims.stream().filter(p-> p.getClaimStatus().equals(status.toUpperCase())).collect(Collectors.toList());
+		} else {
+			userClaims=claims;
+		}
+		
 		List<Nominee> nominees = nomineeService.findByNomineeId(id);		
 		User user=userService.getUserDetails(id);
+		
 		user.setClaimList(userClaims);
 		user.setNomineeList(nominees);
 		
-		return user;
+		return ResponseEntity.ok(user);
 	}
 
 }
