@@ -1,10 +1,13 @@
 package com.insurance.restcontroller;
 
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.insurance.entity.Claim;
@@ -27,11 +30,13 @@ public class UserRestController {
 	private NomineeService nomineeService;
 	
 	@GetMapping("/users/{id}")
-	public User getUser(@PathVariable ("id") Integer id) {
+	public User getUser(@PathVariable ("id") Integer id, @RequestParam("status") String status) {
 		List<Claim> claims=claimService.findByClaimsId(id);
+		List<Claim> userClaims=claims.stream().filter(p-> p.getClaimStatus().equals(status.toUpperCase())).collect(Collectors.toList());
+
 		List<Nominee> nominees = nomineeService.findByNomineeId(id);		
 		User user=userService.getUserDetails(id);
-		user.setClaimList(claims);
+		user.setClaimList(userClaims);
 		user.setNomineeList(nominees);
 		
 		return user;
