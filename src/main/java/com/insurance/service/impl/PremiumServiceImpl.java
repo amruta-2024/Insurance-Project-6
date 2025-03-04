@@ -1,5 +1,7 @@
 package com.insurance.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,12 @@ public class PremiumServiceImpl implements PremiumService {
 		System.out.println("From the service class..");
 		premiumRepository.deleteById(id);
 
+	}
+	
+	//Task-843-Design-Api-to-get-all-the-premium-details-from-database
+	@Override
+	public List<PremiumDetails> getAllPremiumDetails(){
+		return premiumRepository.findAll();		
 	}
 
 }
